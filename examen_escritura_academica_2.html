@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen de práctica — Lectura, escritura académica e investigación</title>
+<style>
+  :root{
+    --ink:#16233b; --ink-soft:#4a5a75; --paper:#f7f8fa; --card:#ffffff;
+    --line:#d9dfe8; --accent:#8a2be2; --accent-deep:#5a1c96;
+    --ok:#1f7a4d; --ok-bg:#e8f5ee; --bad:#b3382c; --bad-bg:#fbeceb; --tag:#eef0f7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.55;padding-bottom:90px}
+  header{background:var(--ink);color:#fff;padding:34px 20px 28px}
+  .wrap{max-width:860px;margin:0 auto;padding:0 4px}
+  header h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.45rem,3.6vw,2.1rem);font-weight:700}
+  header p{color:#b9c3d6;margin-top:8px;font-size:.95rem;max-width:640px}
+  header .meta{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  header .meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+    border-radius:999px;padding:4px 12px;font-size:.78rem;letter-spacing:.4px}
+  main{max-width:860px;margin:26px auto;padding:0 16px}
+  .art-head{margin:34px 0 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .art-head .num{font-family:Georgia,serif;font-size:1.9rem;color:var(--accent-deep);font-weight:700}
+  .art-head small{color:var(--ink-soft);font-size:.83rem;width:100%}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px 18px 14px;margin-bottom:14px}
+  .q .qtitle{font-weight:600;margin-bottom:12px;font-size:.98rem}
+  .q .qtitle b{color:var(--accent-deep);margin-right:6px}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;
+    border:1px solid transparent;border-radius:8px;cursor:pointer;font-size:.93rem}
+  .opt:hover{background:#f2f4f9}
+  .opt input{margin-top:3px;accent-color:var(--accent-deep);flex-shrink:0}
+  .q.graded .opt{cursor:default}
+  .q.graded .opt:hover{background:transparent}
+  .opt.right{background:var(--ok-bg);border-color:#bfe0cf}
+  .opt.wrong{background:var(--bad-bg);border-color:#ecc6c2}
+  .expl{display:none;margin-top:12px;padding:12px 14px;border-radius:8px;font-size:.87rem;
+    background:var(--tag);border-left:4px solid var(--accent-deep);color:var(--ink-soft)}
+  .q.graded .expl{display:block}
+  .verdict{display:none;font-size:.82rem;font-weight:700;margin-top:10px;letter-spacing:.3px}
+  .q.graded .verdict{display:inline-block}
+  .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+  .bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    box-shadow:0 -4px 18px rgba(22,35,59,.08);padding:12px 16px}
+  .bar .inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .bar .count{font-size:.86rem;color:var(--ink-soft);flex:1;min-width:140px}
+  .bar .count b{color:var(--ink)}
+  button{font-family:inherit;font-size:.92rem;font-weight:700;border:none;border-radius:9px;
+    padding:11px 22px;cursor:pointer}
+  #grade{background:var(--accent-deep);color:#fff}
+  #grade:hover{background:var(--accent)}
+  #reset{background:#eef0f7;color:var(--ink)}
+  #reset:hover{background:#e2e6f0}
+  #score{display:none;margin:26px 0 8px;padding:22px;border-radius:12px;
+    background:var(--ink);color:#fff;text-align:center}
+  #score .big{font-family:Georgia,serif;font-size:2.4rem;font-weight:700}
+  #score p{color:#b9c3d6;font-size:.9rem;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Examen de práctica · 30 preguntas</h1>
+    <p>Lectura, escritura académica, IA generativa e investigación científica. Las opciones se barajan en cada intento — presiona <b>Calificar</b> para ver aciertos y explicaciones, y <b>Reiniciar</b> para volver a intentarlo con otro orden.</p>
+    <div class="meta">
+      <span>A1 Flores Aguilar (2018)</span><span>A2 Flores Guerrero (2016)</span>
+      <span>A3 Herrera (2025)</span><span>A4 Comas (2023)</span><span>A5 Vargas (2004)</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="score"><div class="big"></div><p></p></div>
+  <div id="quiz"></div>
+</main>
+
+<div class="bar">
+  <div class="inner">
+    <div class="count"><b id="answered">0</b> / 30 respondidas</div>
+    <button id="reset" onclick="resetQuiz()">Reiniciar</button>
+    <button id="grade" onclick="grade()">Calificar</button>
+  </div>
+</div>
+
+<script>
+const ARTS = [
+ "Artículo 1 · Flores Aguilar — ¡Qué complejidad! El significado de escribir bien (2018)",
+ "Artículo 2 · Flores Guerrero — Lectura, redacción y pensamiento crítico en la educación superior (2016)",
+ "Artículo 3 · Herrera — Uso inteligente de la IA generativa para la escritura académica (2025)",
+ "Artículo 4 · Comas Rodríguez — La investigación científica universitaria y su impacto en la sociedad (2023)",
+ "Artículo 5 · Vargas — Acerca de la escritura de artículos científicos (2004)"
+];
+
+// c = índice de la opción correcta en el arreglo ORIGINAL (antes de barajar)
+const Q = [
+// ---------- ARTÍCULO 1 ----------
+{a:0,q:"Según Flores Aguilar, la responsabilidad de “escribir bien” puede atribuirse a:",
+ o:["Los antecedentes familiares y escolares, que son los que definen por completo la escritura adecuada",
+    "El entorno de escritura, las personas con quienes se colabora y las situaciones comunicativas vividas en comunidades concretas",
+    "La normatividad establecida por la comunidad académica internacional para cada género",
+    "El dominio del tema y del tipo textual que se elige en cada situación de escritura"],c:1,
+ e:"Trampa en la opción de los antecedentes: el artículo dice que ayudan, pero NO son los que lo definen por completo. La tesis es que la responsabilidad recae en el entorno, los colaboradores y las comunidades concretas."},
+{a:0,q:"¿Cuál de las siguientes definiciones corresponde a “comunidad discursiva”?",
+ o:["Grupo en el que regularmente se comunica una persona, con metas e intereses públicos en común y esquemas claros de comunicación",
+    "Grupo de expertos que establece la normatividad del idioma y corrige los escritos de los aprendices",
+    "Conjunto de lectores de un mismo nivel educativo que juzga la calidad de los textos que recibe",
+    "Grupo profesional que produce escritos públicos con fines administrativos, jurídicos o académicos"],c:0,
+ e:"La nota al pie añade que sus integrantes contribuyen a la formación de los aprendices. La segunda opción describe algo parecido a la RAE; la cuarta confunde con la clasificación de escritos públicos."},
+{a:0,q:"Los dos puntos en común que la autora encontró en todos los grupos con los que trabajó son que desean:",
+ o:["Que sus escritos sean claros y se ajusten al formato del género que utilizan",
+    "Que no tengan faltas de ortografía y que dominen la argumentación",
+    "Que no tengan faltas de ortografía y que sus mensajes sean claros",
+    "Que sus mensajes sean claros y adecuados a la audiencia que los recibe"],c:2,
+ e:"Literal del texto: sin faltas de ortografía + mensajes claros. Las demás opciones sustituyen uno de los dos elementos por conceptos que aparecen en otras partes del artículo (género, argumentación, audiencia)."},
+{a:0,q:"Sobre la relación entre forma y contenido, el artículo sostiene que:",
+ o:["Pueden evaluarse por separado, pues la ortografía pertenece solo a la forma",
+    "Están entrelazados, y al leer suele ser difícil separar ambos aspectos en la apreciación de un texto",
+    "La forma depende del auditorio y el contenido depende únicamente del escritor",
+    "El contenido determina la forma cuando el escrito es público, pero no cuando es privado"],c:1,
+ e:"Ojo: la ortografía tiene que ver con la forma y, en múltiples casos, también con el contenido. Forma y contenido dependen del auditorio, del contexto y del dominio del tema — pero están entrelazados."},
+{a:0,q:"El estudio de González Robles (2014) en la zona metropolitana de la Ciudad de México:",
+ o:["Evaluó 4 041 ensayos y concluyó que la responsabilidad recae en los niveles de estudio anteriores",
+    "Comparó las prácticas de escritura del siglo pasado con las actuales en estudiantes de reciente ingreso",
+    "Evaluó 4 041 ensayos y mostró la necesidad de que los docentes universitarios programen más actividades de escritura",
+    "Evaluó 1 041 ensayos y demostró que los jóvenes universitarios escriben peor que antes"],c:2,
+ e:"La primera opción invierte la conclusión: el estudio pide justamente NO atribuir la responsabilidad únicamente a los niveles anteriores. La comparación pasado-presente es el tema de Lunsford y Lunsford, no de este estudio."},
+{a:0,q:"Frente a la afirmación de que “los jóvenes de hoy no escriben bien”, el artículo concluye que:",
+ o:["Mosenthal (1983) lo demostró con muestras representativas en México",
+    "Lunsford y Lunsford (2008) comprobaron que los errores actuales superan a los del siglo pasado",
+    "Solo puede afirmarse respecto de la ortografía, no respecto de la claridad de los mensajes",
+    "No puede afirmarse: no existe un estudio con muestras representativas que compare las prácticas del pasado y las de hoy"],c:3,
+ e:"Lunsford y Lunsford (2008) se citan justamente para decir que NO existe esa evidencia comparativa. Mosenthal (1983) aporta otra idea: el concepto de “mejor” o “peor” escritura depende de quien la juzgue."},
+// ---------- ARTÍCULO 2 ----------
+{a:1,q:"El concepto de “mundo plano” que enmarca el artículo pertenece a:",
+ o:["Wagner (2008), en The Global Achievement Gap",
+    "Friedman (2005): los efectos de la globalización pasaron de verticales a horizontales",
+    "La OCDE (2011), en su informe sobre la lectura por placer",
+    "Toscana (2013), en The Country That Stopped Reading"],c:1,
+ e:"Friedman (2005), The World is Flat. Wagner y Toscana sí aparecen en el artículo, pero con otras ideas: habilidades de supervivencia y el declive lector de México, respectivamente."},
+{a:1,q:"¿Cuál correspondencia de cifras de la OCDE (2011) es la correcta?",
+ o:["El 37% no lee por placer; el 72% de los alumnos aventajados lee diariamente por placer",
+    "El 37% de los aventajados lee por placer; el 72% del total no lee por placer",
+    "El 56% no lee por placer; el 37% de los desaventajados lee diariamente por placer",
+    "El 72% no lee por placer; el 56% de los aventajados lee diariamente por placer"],c:0,
+ e:"37% = promedio que NO lee por placer. 72% = aventajados que leen diariamente por placer, contra 56% de los desaventajados. Las otras opciones barajan las mismas tres cifras — memoriza qué mide cada una."},
+{a:1,q:"En el índice de lectura de la UNESCO, México:",
+ o:["Ocupa el último lugar de 108 naciones, con 2.8 libros al año",
+    "Ocupa el penúltimo lugar de 108 naciones, con 2.8 libros al año",
+    "Ocupa el penúltimo lugar de 180 naciones, con 3.8 libros al año",
+    "Ocupa el lugar 106 de 108, con 7.5 libros al año"],c:1,
+ e:"Penúltimo (no último) de 108 naciones; 2.8 libros/año vs. España 7.5 y Alemania 12. Solo 2% de la población tiene hábito permanente de lectura."},
+{a:1,q:"Según la Encuesta Nacional de Lectura, el porcentaje de mexicanos que leen libros pasó de:",
+ o:["46.2% en 2006 a 56% en 2012",
+    "56% en 2006 a 46.2% en 2012",
+    "74% en 2006 a 46.2% en 2012",
+    "56% en 2006 a 21% en 2012"],c:1,
+ e:"De 56% a 46.2%: un declive que motivó el apodo “el país que dejó de leer”. El 74% corresponde a hogares con al menos un libro (INEGI) y el 21% al estudio de Parametría (personas que empezaron un libro en 6 meses)."},
+{a:1,q:"Sobre el hallazgo de PISA respecto a la lectura por placer:",
+ o:["La diferencia crucial está en cuánto tiempo dedican los alumnos a leer cada día",
+    "Leer diariamente por placer equivale a una puntuación superior a un año y medio de escolarización",
+    "Los alumnos que leen por placer duplican la puntuación de quienes no lo hacen",
+    "La ventaja de año y medio se observa solo en alumnos socioeconómicamente aventajados"],c:1,
+ e:"El matiz que suelen preguntar: la diferencia crucial NO es cuánto tiempo se lee, sino leer diariamente por placer. Esa práctica equivale a un año y medio más de escolarización."},
+{a:1,q:"Según Friedman (2014) respecto a compañías como Google, al mundo laboral competitivo:",
+ o:["Le interesa lo que sabes, demostrado mediante títulos y certificaciones",
+    "Le interesan personas con memoria y dominio de habilidades básicas estandarizadas",
+    "Le interesa qué puedes hacer con lo que sabes, y busca curiosidad intelectual",
+    "Le interesa el desempeño obtenido en las evaluaciones PISA de lectura"],c:2,
+ e:"“Qué puedes hacer con lo que sabes y no lo que sabes”. Wagner & Compton (2012) añaden que Google considera la curiosidad intelectual la habilidad más importante al contratar."},
+// ---------- ARTÍCULO 3 ----------
+{a:2,q:"La crítica central de Herrera sobre la llegada de la IA a la educación es que:",
+ o:["Reemplazó por completo a los docentes de escritura en los países latinoamericanos",
+    "Ingresó sin ninguna mediación previa y sin analizar la pertinencia ni las consecuencias de su uso",
+    "La UNESCO prohibió su uso en el aula mientras no exista un filtro académico",
+    "Los organismos reguladores validaron sus contenidos sin consultar a los docentes"],c:1,
+ e:"El afán de “innovar” metió la IA al aula sin reflexión ni preparación. La UNESCO no la prohíbe: recomienda evaluación rigurosa. Giannini señala que los reguladores NO han validado los contenidos — no que los validaron mal."},
+{a:2,q:"Los cuatro criterios fundamentales que exige Giannini (2023) para los contenidos de la IA en educación son:",
+ o:["Respeto, protección y promoción de los derechos humanos y la dignidad humana",
+    "Exactitud del contenido, adecuación a la edad, pertinencia de los métodos pedagógicos e idoneidad cultural y social",
+    "Precisión del modelo, transparencia algorítmica, privacidad de datos y equidad de acceso",
+    "Proporcionalidad, inocuidad, calidad educativa y evaluación de repercusiones"],c:1,
+ e:"La primera opción corresponde a la Recomendación de ética de la UNESCO (2022); la última mezcla el principio de proporcionalidad e inocuidad — ambos reales pero de otra fuente. Distingue Giannini vs. UNESCO 2022."},
+{a:2,q:"El estudio de Kosmyna et al. (2025), “Tu cerebro en ChatGPT”, encontró que:",
+ o:["Escribir con ChatGPT aumenta la carga cognitiva y fortalece el control ejecutivo",
+    "Escribir sin IA disminuye la conectividad cerebral debido al mayor esfuerzo requerido",
+    "Escribir con ChatGPT agiliza el proceso pero disminuye las habilidades de aprendizaje y la conectividad cerebral",
+    "Los efectos positivos a largo plazo ya fueron confirmados mediante estudios longitudinales"],c:2,
+ e:"Las dos primeras opciones invierten los resultados: es escribir SIN IA lo que incrementa la interacción de la red cerebral y el control ejecutivo. Y los investigadores piden estudios longitudinales — aún no existen."},
+{a:2,q:"La propuesta central del autor frente a la IA generativa es:",
+ o:["Retirarla del aula hasta que existan estudios longitudinales concluyentes",
+    "Permitir solo IA estrechas como estilector.com y prohibir las generativas",
+    "Un término medio: usarla como apoyo del proceso de escritura, sin que lo reemplace, con docentes capacitados",
+    "Delegarle la corrección formal para que el docente se concentre en la argumentación"],c:2,
+ e:"Ni prohibición ni delegación: término medio que no afecte los procesos cerebrales a largo plazo. Estilector se recomienda, pero como complemento — no como política de prohibir las generativas."},
+{a:2,q:"El relato de Asimov citado como analogía de nuestra dependencia de la IA es:",
+ o:["“La última pregunta”, donde Multivac responde sobre el destino del universo",
+    "“Todos los males del mundo”, donde la humanidad depende de la computadora Multivac",
+    "“Yo, robot”, donde las máquinas desarrollan una voluntad propia",
+    "“Nexus”, una breve historia de las redes de información"],c:1,
+ e:"“Todos los males del mundo” (1958): la gente tenía fe absoluta en Multivac, que aprendería a engañar y burlar a la Humanidad. “Nexus” es de Harari (2024), también citado pero como referencia final sobre carbono vs. silicio."},
+{a:2,q:"Entre las técnicas de revisión SIN IA generativa que recomienda el autor está:",
+ o:["Dejar reposar el texto, leerlo en voz alta y hacer una relectura inversa antes de ajustar",
+    "Redactar párrafos de máximo 8 líneas y verificar el texto con dos IA generativas distintas",
+    "Parafrasear con la voz del autor y hacer la revisión final con Copilot en Microsoft Edge",
+    "Leer en silencio un modelo de ensayo y corregir el propio texto inmediatamente al terminarlo"],c:0,
+ e:"Los ajustes deben hacerse SIN recurrir a una IA generativa (Copilot es generativa; se sugiere solo para buscar información). Los párrafos recomendados son de mínimo 8 y máximo 10 líneas, y los modelos a leer son mínimo tres."},
+// ---------- ARTÍCULO 4 ----------
+{a:3,q:"La investigación científica universitaria se define como:",
+ o:["Un proceso de indagación colectiva orientado a la acreditación institucional y la mejora del claustro",
+    "Un proceso sistemático y riguroso para obtener y difundir conocimientos, solucionar problemas o confirmar y refutar teorías",
+    "El conjunto de proyectos de vinculación con la sociedad desarrollados por los semilleros",
+    "Una actividad propia del posgrado destinada a producir publicaciones en revistas indexadas"],c:1,
+ e:"Definición de García-González & Sánchez-Sánchez (2020). No se limita al posgrado: forma profesionales en pregrado y posgrado, y la vinculación con la sociedad es otro proceso sustantivo, no la definición."},
+{a:3,q:"Dentro de las universidades, la investigación científica se estructura en:",
+ o:["Semilleros dirigidos directamente por el editor general de cada revista",
+    "Grupos de investigación amparados en líneas y programas acordes a sus intereses y necesidades regionales",
+    "Redes internacionales que definen las líneas según estándares globales",
+    "Departamentos académicos que asignan los temas de investigación a los docentes"],c:1,
+ e:"Grupos de investigación con líneas y programas según necesidades regionales (Vallejo López, 2020). Los semilleros aparecen en las referencias (Calla et al.), pero no como la estructura que describe el editorial."},
+{a:3,q:"Según el editorial, al participar en actividades de investigación los estudiantes:",
+ o:["Se convierten en agentes activos de su aprendizaje, con autonomía y habilidades transferibles",
+    "Se especializan tempranamente y asumen parte de la carga docente de los investigadores",
+    "Aplican teorías en simulaciones controladas diseñadas por los grupos de investigación",
+    "Adquieren las habilidades básicas que antes se fijaban como un mínimo estándar"],c:0,
+ e:"Aplican lo aprendido en situaciones REALES (no simulaciones) y desarrollan autonomía (Granados Ortiz y Padilla Escorcia, 2021). La opción del “mínimo estándar” viene del artículo 2 (OCDE) — distractor cruzado."},
+{a:3,q:"La “mentalidad científica” que desarrolla la práctica investigativa se caracteriza por:",
+ o:["Curiosidad, búsqueda constante de conocimiento y capacidad de cuestionar y evaluar críticamente la información",
+    "Rigor metodológico, disciplina estadística y dominio de la escritura académica",
+    "Innovación, emprendimiento y colaboración en redes de investigación",
+    "Objetividad, neutralidad y respeto por el argumento de autoridad"],c:0,
+ e:"Definición literal del texto. “Innovación y emprendimiento” es el título de una referencia (Arroyo et al.), y el respeto al argumento de autoridad es justo lo que el artículo 3 (Herrera/Sagan) pide cuestionar."},
+{a:3,q:"El reto actual de las universidades, según Comas Rodríguez, es:",
+ o:["Incrementar los índices de impacto de sus revistas institucionales",
+    "Lograr la sinergia de los procesos sustantivos: académico, investigación y vinculación con la sociedad",
+    "Crear semilleros de investigación en todas las facultades y programas",
+    "Actualizar el conocimiento de los docentes mediante estudios de posgrado"],c:1,
+ e:"La sinergia: del ejercicio académico surgen ideas de investigación, la investigación actualiza a los docentes, y la vinculación con la sociedad desarrolla habilidades y levanta información. La actualización docente es un efecto, no el reto."},
+{a:3,q:"Por su tipo, el texto de Comas Rodríguez es:",
+ o:["Un artículo de reflexión temática",
+    "Una comunicación libre",
+    "Una nota editorial",
+    "Un artículo de revisión (review)"],c:2,
+ e:"Nota editorial firmada por el Editor General de Uniandes EPISTEME. Cuidado: “artículo de reflexión temática” es la etiqueta del artículo 2 (Zona Próxima) y “comunicación libre” la del artículo 1 (revista Ciencia)."},
+// ---------- ARTÍCULO 5 ----------
+{a:4,q:"Según Vargas, una investigación solo está completa cuando:",
+ o:["Sus resultados son razonablemente consistentes, reproducibles y completos",
+    "Se comunica y publica en un journal indexado con revisión por pares",
+    "Los referees externos aceptan el manuscrito sin solicitar revisiones",
+    "Se presenta en un foro público, como un seminario o una conferencia"],c:1,
+ e:"La consistencia y reproducibilidad son requisitos para decidir SI vale la pena publicar; la presentación en seminarios es una etapa preliminar para recibir comentarios. La investigación se completa al publicarse."},
+{a:4,q:"Complete la idea del artículo: “Una escritura pobre indica…”",
+ o:["…una revisión de literatura insuficiente al inicio del proyecto",
+    "…un pensamiento pobre, y ambos son desastrosos para la investigación y su publicación",
+    "…falta de dominio del género discursivo que exige el journal elegido",
+    "…que el autor sobreestimó el tamaño de su audiencia potencial"],c:1,
+ e:"Frase del resumen. La sobreestimación de la audiencia sí aparece en el artículo, pero como el error típico al elegir journal (“los investigadores tienen egos muy saludables”), no en esta frase."},
+{a:4,q:"El índice de impacto de un journal se calcula como:",
+ o:["Las citas recibidas en un año a los artículos de los dos años previos, entre los artículos publicados en esos dos años",
+    "Las citas históricas acumuladas del journal, entre el total de artículos publicados desde su fundación",
+    "Los artículos publicados en dos años, divididos entre las citas recibidas ese año",
+    "Las citas del año en curso a artículos del mismo año, entre los artículos publicados ese año"],c:0,
+ e:"Ejemplo del texto: Nature 2002 = 59 403 citas (a artículos de 2000-2001) / 1 952 artículos ≈ 30.4. La tercera opción invierte numerador y denominador; la cuarta usa el año equivocado."},
+{a:4,q:"Sobre los journals de alto prestigio, el artículo advierte que:",
+ o:["Rechazan hasta el 75% de los manuscritos, lo que garantiza meses de espera",
+    "Rechazan hasta el 90%, por lo que someter un paper ahí puede dejarlo “en el limbo” por meses",
+    "Rechazan hasta el 48%, cifra equivalente al índice de impacto máximo reportado",
+    "Rechazan el 80% de los manuscritos, según el principio de beneficio-costo"],c:1,
+ e:"Hasta 90% de rechazo. El 48 es el tope del rango de índice de impacto en Bio/Medicina, y el 80% viene del principio 20/80 (esfuerzo/resultados) — dos cifras del mismo artículo usadas aquí como distractores."},
+{a:4,q:"El orden recomendado para las etapas de revisión del manuscrito es:",
+ o:["Gramática y puntuación → fraseo y estilo → organización y lógica",
+    "Organización y lógica → fraseo y estilo → gramática y puntuación",
+    "Fraseo y estilo → organización y lógica → gramática y puntuación",
+    "Título y secciones → lista de referencias → estilo y gramática"],c:1,
+ e:"La revisión va en tareas de escala cada vez MENOR: primero lo estructural (organización y lógica), luego fraseo y estilo, y al final el refinamiento de gramática y puntuación."},
+{a:4,q:"Al responder los comentarios de los referees, el autor debe:",
+ o:["Responder solo los comentarios con mérito e ignorar los equivocados para no alargar el proceso",
+    "Responder punto por punto, aceptar lo que tiene mérito y explicar con diplomacia por qué rechaza lo demás",
+    "Apelar a la junta de editores antes de modificar el manuscrito, para dejar constancia del desacuerdo",
+    "Incorporar todos los cambios sugeridos sin excepción, dado que los referees pueden no ser anónimos"],c:1,
+ e:"Se responde TODO, punto por punto; se puede rechazar una sugerencia, pero justificando por qué, sin rabia ni sarcasmo. La apelación existe, pero solo tras un rechazo del manuscrito — no como paso previo a la revisión."}
+];
+
+// ---- Render con opciones barajadas ----
+const quiz = document.getElementById('quiz');
+const perm = [];  // perm[i] = arreglo con el orden barajado de índices originales
+
+function shuffled(n){
+  const a=[...Array(n).keys()];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+
+function render(){
+  quiz.innerHTML='';
+  perm.length=0;
+  let lastArt=-1;
+  Q.forEach((it,i)=>{
+    if(it.a!==lastArt){
+      lastArt=it.a;
+      const h=document.createElement('div');
+      h.className='art-head';
+      h.innerHTML=`<span class="num">A${it.a+1}</span><small>${ARTS[it.a]}</small>`;
+      quiz.appendChild(h);
+    }
+    const ord=shuffled(it.o.length);
+    perm[i]=ord;
+    const d=document.createElement('div');
+    d.className='q'; d.id='q'+i;
+    d.innerHTML=`<div class="qtitle"><b>${i+1}.</b>${it.q}</div>`+
+      ord.map(origIdx=>`<label class="opt" data-orig="${origIdx}"><input type="radio" name="q${i}" value="${origIdx}" onchange="upd()"><span>${it.o[origIdx]}</span></label>`).join('')+
+      `<span class="verdict"></span><div class="expl">${it.e}</div>`;
+    quiz.appendChild(d);
+  });
+  upd();
+}
+
+function upd(){
+  const n=Q.reduce((acc,_,i)=>acc+(document.querySelector(`input[name=q${i}]:checked`)?1:0),0);
+  document.getElementById('answered').textContent=n;
+}
+
+function grade(){
+  let ok=0,ans=0;
+  Q.forEach((it,i)=>{
+    const box=document.getElementById('q'+i);
+    box.classList.add('graded');
+    const sel=document.querySelector(`input[name=q${i}]:checked`);
+    const v=box.querySelector('.verdict');
+    box.querySelectorAll('.opt').forEach(o=>o.classList.remove('right','wrong'));
+    box.querySelector(`.opt[data-orig="${it.c}"]`).classList.add('right');
+    if(sel){
+      ans++;
+      const j=+sel.value;
+      if(j===it.c){ok++;v.textContent='✓ Correcto';v.className='verdict ok';}
+      else{box.querySelector(`.opt[data-orig="${j}"]`).classList.add('wrong');v.textContent='✗ Incorrecto';v.className='verdict bad';}
+    }else{
+      v.textContent='Sin responder — la correcta está en verde';v.className='verdict bad';
+    }
+    box.querySelectorAll('input').forEach(inp=>inp.disabled=true);
+  });
+  const s=document.getElementById('score');
+  s.style.display='block';
+  s.querySelector('.big').textContent=`${ok} / 30`;
+  const pct=Math.round(ok/30*100);
+  let msg;
+  if(pct>=90) msg='Excelente — dominas los cinco artículos. Repasa solo las que fallaste.';
+  else if(pct>=70) msg='Buen nivel. Lee las explicaciones de tus errores: casi todos los distractores usan datos reales de otros artículos.';
+  else if(pct>=50) msg='Vas a la mitad. Enfócate en distinguir qué autor dijo qué y qué mide cada cifra.';
+  else msg='Necesitas otra pasada completa. Empieza por las tesis centrales y luego las cifras y autores citados.';
+  s.querySelector('p').textContent=`${pct}% de aciertos (${ans} respondidas). ${msg}`;
+  s.scrollIntoView({behavior:'smooth'});
+}
+
+function resetQuiz(){
+  document.getElementById('score').style.display='none';
+  render();  // re-baraja las opciones en cada nuevo intento
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
