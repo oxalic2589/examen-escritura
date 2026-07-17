@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen Final · Límites y Derivadas</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(','\\)'], ['$','$']] },
+    svg: { fontCache: 'global' },
+    options: { renderActions: { addMenu: [] } }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#0d1424;
+    --ink2:#16213b;
+    --paper:#eef1f6;
+    --card:#ffffff;
+    --line:#dde3ee;
+    --line2:#c9d2e2;
+    --accent:#2f45c5;
+    --accent-soft:#eaedfb;
+    --ok:#0c8a5b;
+    --ok-soft:#e4f6ee;
+    --bad:#d32846;
+    --bad-soft:#fbe7ea;
+    --amber:#e08a00;
+    --muted:#5c6880;
+    --ink-muted:#9aa6c0;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:var(--ink);
+    color:#fff;
+    overflow:hidden;
+    padding:52px 24px 120px;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:34px 34px;
+    mask-image:radial-gradient(ellipse 90% 80% at 50% 0%, #000 40%, transparent 100%);
+  }
+  .hero-inner{position:relative;max-width:900px;margin:0 auto}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem; letter-spacing:.28em; text-transform:uppercase;
+    color:#8fa0d8; margin:0 0 18px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(2.3rem,6vw,4rem);
+    line-height:1.02;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  .hero h1 em{font-style:italic;color:#9fb0ff}
+  .hero p.sub{
+    max-width:560px; color:#c3cbe0; font-size:1.05rem; margin:0 0 30px;
+  }
+  .hero-curve{
+    position:absolute; right:-40px; bottom:36px; width:340px; height:200px;
+    opacity:.9; pointer-events:none;
+  }
+  @media(max-width:760px){.hero-curve{display:none}}
+  .meta-row{display:flex;flex-wrap:wrap;gap:26px;font-family:'JetBrains Mono',monospace}
+  .meta-row .m{display:flex;flex-direction:column;gap:2px}
+  .meta-row .m b{font-size:1.5rem;font-weight:700;color:#fff;line-height:1}
+  .meta-row .m span{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#8493bd}
+
+  /* ---------- STICKY BAR ---------- */
+  .statusbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:11px 20px;
+  }
+  .statusbar-inner{
+    max-width:900px;margin:0 auto;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .ruler{
+    flex:1; min-width:160px; height:10px; position:relative;
+    background:
+      repeating-linear-gradient(90deg,var(--line2) 0 1px,transparent 1px 10%);
+    border-radius:6px; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .ruler .fill{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg,var(--accent),#5a6ff0);
+    transition:width .35s ease;
+  }
+  .status-count{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--muted);white-space:nowrap}
+  .status-count b{color:var(--ink)}
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:.9rem;
+    border:none;border-radius:9px;padding:10px 18px;cursor:pointer;
+    transition:transform .08s ease,box-shadow .15s ease,background .15s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 3px 12px rgba(47,69,197,.28)}
+  .btn-primary:hover{background:#2536a6}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line2)}
+  .btn-ghost:hover{color:var(--ink);border-color:var(--muted)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  /* ---------- MAIN ---------- */
+  main{max-width:900px;margin:0 auto;padding:40px 20px 90px}
+
+  .topic-head{
+    display:flex;align-items:baseline;gap:14px;
+    margin:46px 0 8px; padding-bottom:10px;
+    border-bottom:2px solid var(--ink);
+  }
+  .topic-head:first-child{margin-top:8px}
+  .topic-head .num{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700}
+  .topic-head h2{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;margin:0;letter-spacing:-.01em;
+  }
+  .topic-head .rng{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-muted)}
+
+  .q{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 22px 20px;
+    margin:16px 0;
+    scroll-margin-top:80px;
+    transition:border-color .2s ease,box-shadow .2s ease;
+  }
+  .q.answered{border-color:var(--line2)}
+  .q-top{display:flex;gap:14px;align-items:flex-start}
+  .q-badge{
+    flex:none;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.82rem;
+    background:var(--ink);color:#fff;border-radius:8px;
+    width:36px;height:36px;display:grid;place-items:center;
+  }
+  .q-stem{font-size:1.02rem;padding-top:5px}
+  .q-stem .lead{color:var(--muted);font-size:.86rem;display:block;margin-bottom:4px}
+
+  .opts{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:9px}
+  .opt{
+    display:flex;align-items:center;gap:13px;
+    border:1.5px solid var(--line);border-radius:10px;
+    padding:11px 15px;cursor:pointer;
+    transition:border-color .12s ease,background .12s ease;
+    user-select:none;
+  }
+  .opt:hover{border-color:var(--line2);background:#f8faff}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt .key{
+    flex:none;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.82rem;
+    width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+    border:1.5px solid var(--line2);color:var(--muted);transition:all .12s ease;
+  }
+  .opt .txt{flex:1}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.sel .key{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* graded states */
+  .q.graded .opt{cursor:default;pointer-events:none}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.correct .key{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt.wrong .key{background:var(--bad);border-color:var(--bad);color:#fff}
+  .mark{margin-left:auto;font-weight:700;font-size:.9rem;font-family:'JetBrains Mono',monospace}
+  .opt.correct .mark{color:var(--ok)}
+  .opt.wrong .mark{color:var(--bad)}
+
+  .exp{
+    margin-top:14px;padding:13px 15px;border-radius:10px;
+    background:#f4f6fb;border-left:3px solid var(--accent);
+    font-size:.92rem;color:var(--ink2);display:none;
+  }
+  .q.graded .exp{display:block}
+  .exp b{color:var(--accent)}
+
+  /* ---------- RESULT PANEL ---------- */
+  .result{
+    display:none;
+    position:sticky; bottom:0; z-index:40;
+    margin:0 -20px;
+  }
+  .result.show{display:block}
+  .result-card{
+    max-width:900px;margin:0 auto;
+    background:var(--ink);color:#fff;
+    border-radius:16px 16px 0 0;
+    padding:22px 26px;
+    box-shadow:0 -10px 40px rgba(13,20,36,.3);
+    display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  }
+  .score-dial{
+    flex:none;width:96px;height:96px;position:relative;display:grid;place-items:center;
+  }
+  .score-dial svg{transform:rotate(-90deg)}
+  .score-dial .pct{
+    position:absolute;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.4rem;
+  }
+  .score-txt{flex:1;min-width:180px}
+  .score-txt h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.35rem;margin:0 0 4px}
+  .score-txt p{margin:0;color:#c3cbe0;font-size:.92rem}
+  .score-txt .grade{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:#9fb0ff}
+  .breakdown{display:flex;gap:16px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:.74rem}
+  .breakdown .bd{display:flex;flex-direction:column;gap:2px;color:#8493bd}
+  .breakdown .bd b{font-size:1.05rem;color:#fff}
+
+  footer{
+    text-align:center;padding:30px 20px 40px;color:var(--ink-muted);
+    font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  }
+  footer a{color:var(--muted)}
+
+  @media(max-width:560px){
+    .q{padding:18px 15px}
+    .q-stem{font-size:.98rem}
+    main{padding:28px 14px 90px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Cálculo · Práctica autoevaluada</p>
+    <h1>Examen final:<br><em>límites &amp; derivadas</em></h1>
+    <p class="sub">50 preguntas de opción múltiple, dificultad media–avanzada, sobre funciones, parábolas, límites, continuidad, derivadas y optimización. Marca, corrige y revisa cada solución.</p>
+    <div class="meta-row">
+      <div class="m"><b>50</b><span>preguntas</span></div>
+      <div class="m"><b>6</b><span>temas</span></div>
+      <div class="m"><b>20</b><span>escala vigesimal</span></div>
+    </div>
+  </div>
+  <svg class="hero-curve" viewBox="0 0 340 200" fill="none">
+    <line x1="0" y1="170" x2="340" y2="170" stroke="#3a4a72" stroke-width="1.5"/>
+    <line x1="60" y1="10" x2="60" y2="195" stroke="#3a4a72" stroke-width="1.5"/>
+    <path d="M10 30 Q140 250 330 40" stroke="#9fb0ff" stroke-width="2.5" fill="none"/>
+    <line x1="30" y1="150" x2="300" y2="70" stroke="#5a6ff0" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <circle cx="165" cy="118" r="4.5" fill="#9fb0ff"/>
+  </svg>
+</header>
+
+<div class="statusbar">
+  <div class="statusbar-inner">
+    <div class="ruler"><div class="fill" id="fill"></div></div>
+    <div class="status-count"><b id="doneCount">0</b>/50 respondidas</div>
+    <button class="btn btn-primary" id="submitBtn">Corregir examen</button>
+    <button class="btn btn-ghost" id="resetBtn">Reiniciar</button>
+  </div>
+</div>
+
+<main id="exam"></main>
+
+<div class="result" id="result">
+  <div class="result-card">
+    <div class="score-dial">
+      <svg width="96" height="96">
+        <circle cx="48" cy="48" r="42" stroke="#2a3454" stroke-width="9" fill="none"/>
+        <circle id="dialArc" cx="48" cy="48" r="42" stroke="#9fb0ff" stroke-width="9" fill="none"
+                stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"/>
+      </svg>
+      <span class="pct" id="dialPct">0%</span>
+    </div>
+    <div class="score-txt">
+      <h3>Resultado</h3>
+      <p><span id="rawScore">0 / 50</span> correctas · nota <span class="grade" id="grade20">0.0</span></p>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+</div>
+
+<footer>
+  Construido para estudio libre · desplegable en GitHub Pages · <a href="#exam">volver al inicio</a>
+</footer>
+
+<script>
+/* ============================================================
+   BANCO DE PREGUNTAS
+   correct = índice de la opción correcta (0..3) en el orden dado
+   ============================================================ */
+const TOPICS = ["Funciones","Parábolas","Límites","Continuidad","Derivadas","Máximos y mínimos"];
+
+const QUESTIONS = [
+/* ---------------- FUNCIONES ---------------- */
+{t:0, stem:`Halla el dominio de \\( f(x)=\\dfrac{\\sqrt{x-3}}{x-5} \\).`,
+ opts:[`\\([3,\\infty)\\)`,`\\([3,5)\\cup(5,\\infty)\\)`,`\\((3,5)\\cup(5,\\infty)\\)`,`\\((-\\infty,5)\\cup(5,\\infty)\\)`], correct:1,
+ exp:`El radicando exige \\(x-3\\ge 0\\Rightarrow x\\ge 3\\); el denominador exige \\(x\\ne 5\\). Se combina: \\([3,5)\\cup(5,\\infty)\\).`},
+
+{t:0, stem:`Si \\(f(x)=2x-1\\) y \\(g(x)=x^2+3\\), calcula \\((f\\circ g)(x)\\).`,
+ opts:[`\\(2x^2+5\\)`,`\\(2x^2+6\\)`,`\\(4x^2-4x+2\\)`,`\\(x^2+2x+2\\)`], correct:0,
+ exp:`\\((f\\circ g)(x)=f(g(x))=2(x^2+3)-1=2x^2+5\\).`},
+
+{t:0, stem:`Si \\(f(x)=3x+2\\), halla la inversa \\(f^{-1}(x)\\).`,
+ opts:[`\\(\\dfrac{x+2}{3}\\)`,`\\(\\dfrac{x-2}{3}\\)`,`\\(3x-2\\)`,`\\(\\dfrac{2-x}{3}\\)`], correct:1,
+ exp:`De \\(y=3x+2\\) se despeja \\(x=\\dfrac{y-2}{3}\\), luego \\(f^{-1}(x)=\\dfrac{x-2}{3}\\).`},
+
+{t:0, stem:`Para \\(f(x)=x^2-4x\\), simplifica \\(f(x+1)-f(x)\\).`,
+ opts:[`\\(2x-4\\)`,`\\(2x+1\\)`,`\\(2x-3\\)`,`\\(-2x-3\\)`], correct:2,
+ exp:`\\(f(x+1)=x^2-2x-3\\); restando \\(f(x)=x^2-4x\\) queda \\(2x-3\\).`},
+
+{t:0, stem:`Halla el dominio de \\( f(x)=\\sqrt{4-x^2} \\).`,
+ opts:[`\\((-2,2)\\)`,`\\([-2,2]\\)`,`\\([0,2]\\)`,`\\(\\mathbb{R}\\)`], correct:1,
+ exp:`Se necesita \\(4-x^2\\ge 0\\Rightarrow x^2\\le 4\\Rightarrow -2\\le x\\le 2\\).`},
+
+/* ---------------- PARÁBOLAS ---------------- */
+{t:1, stem:`Determina el vértice de \\( y=x^2-6x+5 \\).`,
+ opts:[`\\((3,-4)\\)`,`\\((-3,-4)\\)`,`\\((3,4)\\)`,`\\((6,5)\\)`], correct:0,
+ exp:`\\(x_v=\\dfrac{-b}{2a}=\\dfrac{6}{2}=3\\); \\(y_v=9-18+5=-4\\). Vértice \\((3,-4)\\).`},
+
+{t:1, stem:`¿Cuál es el valor mínimo de \\( y=2x^2-8x+3 \\)?`,
+ opts:[`\\(5\\)`,`\\(-3\\)`,`\\(-5\\)`,`\\(2\\)`], correct:2,
+ exp:`\\(x_v=\\dfrac{8}{4}=2\\); \\(y=2(4)-16+3=-5\\). Como \\(a>0\\), es mínimo.`},
+
+{t:1, stem:`La parábola de vértice \\((0,0)\\), forma \\(y=ax^2\\), pasa por \\((2,8)\\). Su ecuación es:`,
+ opts:[`\\(y=4x^2\\)`,`\\(y=2x^2\\)`,`\\(y=x^2+4\\)`,`\\(y=8x^2\\)`], correct:1,
+ exp:`\\(8=a(2)^2=4a\\Rightarrow a=2\\), por tanto \\(y=2x^2\\).`},
+
+{t:1, stem:`Los cortes con el eje \\(x\\) de \\( y=x^2-x-6 \\) son:`,
+ opts:[`\\(x=-3,\\ x=2\\)`,`\\(x=3,\\ x=2\\)`,`\\(x=3,\\ x=-2\\)`,`\\(x=6,\\ x=1\\)`], correct:2,
+ exp:`\\(x^2-x-6=(x-3)(x+2)=0\\Rightarrow x=3,\\ x=-2\\).`},
+
+{t:1, stem:`El eje de simetría de \\( y=-x^2+4x-1 \\) es:`,
+ opts:[`\\(x=2\\)`,`\\(x=-2\\)`,`\\(x=4\\)`,`\\(x=1\\)`], correct:0,
+ exp:`\\(x=\\dfrac{-b}{2a}=\\dfrac{-4}{2(-1)}=2\\).`},
+
+/* ---------------- LÍMITES ---------------- */
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 2}\\frac{x^2-4}{x-2} \\)`,
+ opts:[`\\(0\\)`,`\\(4\\)`,`\\(2\\)`,`no existe`], correct:1,
+ exp:`\\(\\dfrac{(x-2)(x+2)}{x-2}=x+2\\to 4\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to -3}\\frac{x^2+x-6}{x^2-9} \\)`,
+ opts:[`\\(\\dfrac{5}{6}\\)`,`\\(-\\dfrac{5}{6}\\)`,`\\(1\\)`,`\\(5\\)`], correct:0,
+ exp:`\\(\\dfrac{(x+3)(x-2)}{(x+3)(x-3)}=\\dfrac{x-2}{x-3}\\to\\dfrac{-5}{-6}=\\dfrac{5}{6}\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 0}\\frac{\\sqrt{x+2}-\\sqrt{2}}{x} \\)`,
+ opts:[`\\(\\dfrac{1}{\\sqrt2}\\)`,`\\(0\\)`,`\\(\\dfrac{\\sqrt2}{4}\\)`,`\\(\\infty\\)`], correct:2,
+ exp:`Racionalizando: \\(\\dfrac{1}{\\sqrt{x+2}+\\sqrt2}\\to\\dfrac{1}{2\\sqrt2}=\\dfrac{\\sqrt2}{4}\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to -2}\\frac{x^3+8}{x^4-16} \\)`,
+ opts:[`\\(\\dfrac{3}{8}\\)`,`\\(-\\dfrac{3}{8}\\)`,`\\(-\\dfrac{3}{16}\\)`,`\\(0\\)`], correct:1,
+ exp:`\\(\\dfrac{(x+2)(x^2-2x+4)}{(x+2)(x-2)(x^2+4)}=\\dfrac{x^2-2x+4}{(x-2)(x^2+4)}\\to\\dfrac{12}{-32}=-\\dfrac38\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to\\infty}\\frac{x^3+3x^2-x-4}{2x^3-x^2+6x} \\)`,
+ opts:[`\\(0\\)`,`\\(1\\)`,`\\(\\dfrac12\\)`,`\\(\\infty\\)`], correct:2,
+ exp:`Grados iguales: el límite es el cociente de coeficientes líderes \\(\\dfrac12\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to\\infty}\\frac{5x^2-3}{7x^4-x^3+2x-1} \\)`,
+ opts:[`\\(\\dfrac57\\)`,`\\(0\\)`,`\\(\\infty\\)`,`\\(5\\)`], correct:1,
+ exp:`El grado del numerador (2) es menor que el del denominador (4): el límite es \\(0\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to\\infty}\\frac{x^5-1}{x^3-2x+5} \\)`,
+ opts:[`\\(1\\)`,`\\(0\\)`,`\\(\\infty\\)`,`\\(-1\\)`], correct:2,
+ exp:`El grado del numerador (5) supera al del denominador (3): el límite es \\(\\infty\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to\\infty}\\frac{\\sqrt[3]{27x^3-2x+5}}{x-1} \\)`,
+ opts:[`\\(27\\)`,`\\(1\\)`,`\\(3\\)`,`\\(\\infty\\)`], correct:2,
+ exp:`\\(\\sqrt[3]{27x^3-\\dots}\\sim 3x\\); dividido por \\(x\\) tiende a \\(3\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 1}\\frac{x^3-1}{x^2-1} \\)`,
+ opts:[`\\(\\dfrac23\\)`,`\\(\\dfrac32\\)`,`\\(1\\)`,`\\(0\\)`], correct:1,
+ exp:`\\(\\dfrac{(x-1)(x^2+x+1)}{(x-1)(x+1)}=\\dfrac{x^2+x+1}{x+1}\\to\\dfrac32\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 2}\\frac{x^4-16}{x^3-8} \\)`,
+ opts:[`\\(\\dfrac{8}{3}\\)`,`\\(2\\)`,`\\(\\dfrac{3}{8}\\)`,`\\(4\\)`], correct:0,
+ exp:`\\(\\dfrac{(x-2)(x+2)(x^2+4)}{(x-2)(x^2+2x+4)}\\to\\dfrac{4\\cdot 8}{12}=\\dfrac83\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 2}\\frac{x^3-x^2-3x+2}{x^2-5x+6} \\)`,
+ opts:[`\\(5\\)`,`\\(-5\\)`,`\\(-1\\)`,`\\(0\\)`], correct:1,
+ exp:`Dividiendo por \\((x-2)\\): \\(\\dfrac{x^2+x-1}{x-3}\\to\\dfrac{5}{-1}=-5\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 3}\\frac{2x^3-5x^2-2x-3}{4x^3-13x^2+4x-3} \\)`,
+ opts:[`\\(\\dfrac{17}{11}\\)`,`\\(1\\)`,`\\(\\dfrac{11}{17}\\)`,`\\(\\dfrac{22}{17}\\)`], correct:2,
+ exp:`Factor común \\((x-3)\\): \\(\\dfrac{2x^2+x+1}{4x^2-x+1}\\to\\dfrac{22}{34}=\\dfrac{11}{17}\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{n\\to\\infty}\\frac{3n^2+8}{7n^2+3n+1} \\)`,
+ opts:[`\\(\\dfrac37\\)`,`\\(\\dfrac73\\)`,`\\(0\\)`,`\\(\\infty\\)`], correct:0,
+ exp:`Grados iguales: cociente de coeficientes líderes \\(\\dfrac37\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to a}\\dfrac{\\frac{1}{x^2+1}-\\frac{1}{a^2+1}}{x-a} \\)`,
+ opts:[`\\(\\dfrac{-2a}{(a^2+1)^2}\\)`,`\\(\\dfrac{2a}{(a^2+1)^2}\\)`,`\\(\\dfrac{-2a}{a^2+1}\\)`,`\\(\\dfrac{-1}{(a^2+1)^2}\\)`], correct:0,
+ exp:`Es la derivada de \\(g(x)=\\dfrac{1}{x^2+1}\\) en \\(a\\): \\(g'(x)=\\dfrac{-2x}{(x^2+1)^2}\\).`},
+
+{t:2, stem:`\\( \\displaystyle\\lim_{x\\to 7}\\frac{x-7}{\\sqrt{x-4}-\\sqrt{3}} \\)`,
+ opts:[`\\(\\sqrt3\\)`,`\\(2\\sqrt3\\)`,`\\(3\\)`,`\\(6\\)`], correct:1,
+ exp:`Racionalizando, el denominador se convierte en \\(x-7\\); queda \\(\\sqrt{x-4}+\\sqrt3\\to 2\\sqrt3\\).`},
+
+/* ---------------- CONTINUIDAD ---------------- */
+{t:3, stem:`Sea \\(f(x)=\\begin{cases}x^2+1 & x\\le 1\\\\ 3x-1 & x>1\\end{cases}\\). ¿Es continua en \\(x=1\\)?`,
+ opts:[`Sí, es continua`,`No: hay un salto`,`No: \\(f(1)\\) no existe`,`No: discontinuidad infinita`], correct:0,
+ exp:`Límite izq. \\(=2\\), límite der. \\(=2\\) y \\(f(1)=2\\): los tres coinciden, es continua.`},
+
+{t:3, stem:`Halla \\(k\\) para que \\(f(x)=\\begin{cases}\\frac{x^2-4}{x-2} & x\\ne 2\\\\ k & x=2\\end{cases}\\) sea continua en \\(x=2\\).`,
+ opts:[`\\(2\\)`,`\\(4\\)`,`\\(0\\)`,`\\(-4\\)`], correct:1,
+ exp:`\\(\\lim_{x\\to2}\\dfrac{x^2-4}{x-2}=x+2\\to 4\\), así que \\(k=4\\).`},
+
+{t:3, stem:`\\( f(x)=\\dfrac{x+3}{x^2-9} \\) tiene una discontinuidad evitable (removible) en:`,
+ opts:[`\\(x=3\\)`,`\\(x=-3\\)`,`\\(x=0\\)`,`\\(x=9\\)`], correct:1,
+ exp:`\\(\\dfrac{x+3}{(x-3)(x+3)}=\\dfrac{1}{x-3}\\): en \\(x=-3\\) el factor se cancela (evitable); en \\(x=3\\) es asíntota.`},
+
+{t:3, stem:`¿En qué valores es discontinua \\( f(x)=\\dfrac{1}{x^2-5x+6} \\)?`,
+ opts:[`\\(x=2\\) y \\(x=3\\)`,`\\(x=-2\\) y \\(x=-3\\)`,`\\(x=5\\) y \\(x=6\\)`,`\\(x=0\\) y \\(x=1\\)`], correct:0,
+ exp:`\\(x^2-5x+6=(x-2)(x-3)=0\\Rightarrow x=2,\\ x=3\\).`},
+
+{t:3, stem:`Sea \\(f(x)=\\begin{cases}ax+1 & x<2\\\\ x^2-1 & x\\ge 2\\end{cases}\\). Halla \\(a\\) para que sea continua en \\(x=2\\).`,
+ opts:[`\\(1\\)`,`\\(3\\)`,`\\(2\\)`,`\\(-1\\)`], correct:0,
+ exp:`\\(f(2)=3\\); se necesita \\(2a+1=3\\Rightarrow a=1\\).`},
+
+{t:3, stem:`La función \\( f(x)=\\dfrac{2}{x-3} \\) tiene asíntota vertical en:`,
+ opts:[`\\(y=3\\)`,`\\(x=0\\)`,`\\(x=3\\)`,`\\(x=2\\)`], correct:2,
+ exp:`El denominador se anula en \\(x=3\\) y \\(\\lim_{x\\to3}f(x)=\\pm\\infty\\): asíntota vertical \\(x=3\\).`},
+
+/* ---------------- DERIVADAS ---------------- */
+{t:4, stem:`Si \\(g(x)=x^6\\), entonces \\(g'(x)=\\)`,
+ opts:[`\\(6x^5\\)`,`\\(x^5\\)`,`\\(6x^6\\)`,`\\(5x^6\\)`], correct:0,
+ exp:`Regla de la potencia: \\(\\dfrac{d}{dx}x^n=nx^{n-1}\\Rightarrow 6x^5\\).`},
+
+{t:4, stem:`Si \\(f(x)=4x\\), entonces \\(f'(x)=\\)`,
+ opts:[`\\(4x\\)`,`\\(4\\)`,`\\(x\\)`,`\\(0\\)`], correct:1,
+ exp:`La derivada de \\(cx\\) es la constante \\(c\\): \\(f'(x)=4\\).`},
+
+{t:4, stem:`Deriva \\( y=6x^3-7x^2-9x+12 \\).`,
+ opts:[`\\(18x^2-14x+12\\)`,`\\(6x^2-7x-9\\)`,`\\(18x^2-14x-9\\)`,`\\(18x^2-14x\\)`], correct:2,
+ exp:`Término a término: \\(18x^2-14x-9\\) (la constante \\(12\\) desaparece).`},
+
+{t:4, stem:`Deriva \\( y=11x^4-2x^3+9x^2+14x-21 \\).`,
+ opts:[`\\(44x^3-6x^2+18x+14\\)`,`\\(44x^3-6x^2+18x-21\\)`,`\\(44x^3-2x^2+18x+14\\)`,`\\(11x^3-6x^2+18x+14\\)`], correct:0,
+ exp:`\\(44x^3-6x^2+18x+14\\); la constante \\(-21\\) se anula.`},
+
+{t:4, stem:`Deriva \\( y=\\dfrac{3x^2}{5}+\\dfrac{7x}{4} \\).`,
+ opts:[`\\(\\dfrac{3x}{5}+\\dfrac74\\)`,`\\(\\dfrac{6x}{5}+\\dfrac74\\)`,`\\(\\dfrac{6x}{5}+\\dfrac{7x}{4}\\)`,`\\(\\dfrac{6x}{5}\\)`], correct:1,
+ exp:`\\(\\dfrac{d}{dx}\\dfrac{3x^2}{5}=\\dfrac{6x}{5}\\) y \\(\\dfrac{d}{dx}\\dfrac{7x}{4}=\\dfrac74\\).`},
+
+{t:4, stem:`Deriva \\( y=\\dfrac{1}{x} \\).`,
+ opts:[`\\(\\dfrac{1}{x^2}\\)`,`\\(-\\dfrac{1}{x^2}\\)`,`\\(-\\dfrac{1}{x}\\)`,`\\(\\ln x\\)`], correct:1,
+ exp:`\\(y=x^{-1}\\Rightarrow y'=-x^{-2}=-\\dfrac{1}{x^2}\\).`},
+
+{t:4, stem:`Deriva \\( y=\\dfrac{3}{x^2} \\).`,
+ opts:[`\\(\\dfrac{6}{x^3}\\)`,`\\(-\\dfrac{3}{x^3}\\)`,`\\(-\\dfrac{6}{x^3}\\)`,`\\(-\\dfrac{6}{x^2}\\)`], correct:2,
+ exp:`\\(y=3x^{-2}\\Rightarrow y'=-6x^{-3}=-\\dfrac{6}{x^3}\\).`},
+
+{t:4, stem:`Deriva \\( y=(5x^3-7)^8 \\) (regla de la cadena).`,
+ opts:[`\\(8(5x^3-7)^7\\)`,`\\(120x^2(5x^3-7)^7\\)`,`\\(15x^2(5x^3-7)^7\\)`,`\\(120x^2(5x^3-7)^8\\)`], correct:1,
+ exp:`\\(8(5x^3-7)^7\\cdot 15x^2=120x^2(5x^3-7)^7\\).`},
+
+{t:4, stem:`Deriva \\( y=(6x^4+2x^3-x^2+8x-11)^4 \\).`,
+ opts:[`\\(4(6x^4+2x^3-x^2+8x-11)^3\\)`,`\\(4(6x^4+2x^3-x^2+8x-11)^3(24x^3+6x^2-2x+8)\\)`,`\\(24x^3+6x^2-2x+8\\)`,`\\(4(6x^4+2x^3-x^2+8x-11)^3(6x^4+2x^3-x^2+8x-11)\\)`], correct:1,
+ exp:`Cadena: \\(4(\\,\\cdot\\,)^3\\) por la derivada del interior \\(24x^3+6x^2-2x+8\\).`},
+
+{t:4, stem:`Deriva \\( y=(x^2+5x-11)(x^3-7x^2-9) \\) (regla del producto).`,
+ opts:[`\\((2x+5)(3x^2-14x)\\)`,`\\((2x+5)(x^3-7x^2-9)+(x^2+5x-11)(3x^2-14x)\\)`,`\\((x^2+5x-11)(3x^2-14x)\\)`,`\\((2x+5)(x^3-7x^2-9)-(x^2+5x-11)(3x^2-14x)\\)`], correct:1,
+ exp:`\\(u'v+uv'\\) con \\(u'=2x+5\\) y \\(v'=3x^2-14x\\).`},
+
+{t:4, stem:`Deriva \\( y=\\dfrac{6x+7}{8x-9} \\) (regla del cociente).`,
+ opts:[`\\(\\dfrac{110}{(8x-9)^2}\\)`,`\\(-\\dfrac{110}{(8x-9)^2}\\)`,`\\(-\\dfrac{110}{8x-9}\\)`,`\\(\\dfrac{48}{(8x-9)^2}\\)`], correct:1,
+ exp:`\\(\\dfrac{6(8x-9)-(6x+7)8}{(8x-9)^2}=\\dfrac{-110}{(8x-9)^2}\\).`},
+
+{t:4, stem:`Deriva \\( y=\\sqrt{x^2+1} \\).`,
+ opts:[`\\(\\dfrac{x}{\\sqrt{x^2+1}}\\)`,`\\(\\dfrac{1}{2\\sqrt{x^2+1}}\\)`,`\\(\\dfrac{2x}{\\sqrt{x^2+1}}\\)`,`\\(\\dfrac{x}{x^2+1}\\)`], correct:0,
+ exp:`\\(y=(x^2+1)^{1/2}\\Rightarrow y'=\\tfrac12(x^2+1)^{-1/2}\\cdot 2x=\\dfrac{x}{\\sqrt{x^2+1}}\\).`},
+
+/* ---------------- MÁXIMOS Y MÍNIMOS ---------------- */
+{t:5, stem:`Para \\( f(x)=x^3-3x^2+4 \\), el valor máximo local es:`,
+ opts:[`\\(0\\)`,`\\(4\\)`,`\\(2\\)`,`\\(-4\\)`], correct:1,
+ exp:`\\(f'=3x^2-6x=0\\Rightarrow x=0,2\\); \\(f''=6x-6\\). En \\(x=0\\), \\(f''<0\\) (máximo) y \\(f(0)=4\\).`},
+
+{t:5, stem:`¿En qué valor de \\(x\\) la función \\( f(x)=x^2-6x+8 \\) alcanza su mínimo?`,
+ opts:[`\\(x=6\\)`,`\\(x=-3\\)`,`\\(x=3\\)`,`\\(x=0\\)`], correct:2,
+ exp:`\\(f'(x)=2x-6=0\\Rightarrow x=3\\); como \\(f''=2>0\\), es mínimo.`},
+
+{t:5, stem:`El costo es \\( C(x)=x^2-40x+500 \\). ¿Qué cantidad \\(x\\) minimiza el costo?`,
+ opts:[`\\(40\\)`,`\\(20\\)`,`\\(500\\)`,`\\(10\\)`], correct:1,
+ exp:`\\(C'(x)=2x-40=0\\Rightarrow x=20\\).`},
+
+{t:5, stem:`Para \\( f(x)=x^3-12x+1 \\), el máximo local ocurre en:`,
+ opts:[`\\(x=2\\)`,`\\(x=-2\\)`,`\\(x=0\\)`,`\\(x=4\\)`], correct:1,
+ exp:`\\(f'=3x^2-12=0\\Rightarrow x=\\pm2\\); \\(f''=6x\\). En \\(x=-2\\), \\(f''<0\\): máximo local.`},
+
+{t:5, stem:`¿Cuál es el valor máximo de \\( f(x)=-2x^2+8x-3 \\)?`,
+ opts:[`\\(2\\)`,`\\(-3\\)`,`\\(5\\)`,`\\(8\\)`], correct:2,
+ exp:`Vértice en \\(x=2\\); \\(f(2)=-8+16-3=5\\). Como \\(a<0\\), es máximo.`},
+
+{t:5, stem:`El ingreso es \\( I(x)=-x^2+100x \\). ¿Qué valor de \\(x\\) maximiza el ingreso?`,
+ opts:[`\\(100\\)`,`\\(25\\)`,`\\(50\\)`,`\\(0\\)`], correct:2,
+ exp:`\\(I'(x)=-2x+100=0\\Rightarrow x=50\\).`},
+
+{t:5, stem:`¿Cuántos puntos críticos tiene \\( f(x)=x^4-8x^2+3 \\)?`,
+ opts:[`\\(2\\)`,`\\(3\\)`,`\\(1\\)`,`\\(4\\)`], correct:1,
+ exp:`\\(f'=4x^3-16x=4x(x-2)(x+2)=0\\Rightarrow x=0,2,-2\\): tres puntos críticos.`}
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const KEYS = ["A","B","C","D"];
+const examEl = document.getElementById('exam');
+const answers = {};      // qIndex -> chosen option index (original)
+let graded = false;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// Group questions by topic in order of appearance
+function build(){
+  examEl.innerHTML='';
+  let lastTopic=-1, topicOrder=[];
+  QUESTIONS.forEach((q,idx)=>{ if(!topicOrder.includes(q.t)) topicOrder.push(q.t); });
+
+  // count ranges per topic for the header label
+  topicOrder.forEach((tIdx,tPos)=>{
+    const items = QUESTIONS.map((q,i)=>({q,i})).filter(o=>o.q.t===tIdx);
+    const head=document.createElement('div');
+    head.className='topic-head';
+    head.innerHTML=`<span class="num">0${tPos+1}</span>
+      <h2>${TOPICS[tIdx]}</h2>
+      <span class="rng">${items.length} preguntas</span>`;
+    examEl.appendChild(head);
+
+    items.forEach(({q,i})=>{
+      const card=document.createElement('article');
+      card.className='q';
+      card.id='q'+i;
+
+      // shuffled display order of options
+      const order = shuffle([0,1,2,3]);
+      let optsHtml='';
+      order.forEach((origIdx,pos)=>{
+        optsHtml+=`<li class="opt" data-q="${i}" data-orig="${origIdx}">
+            <input type="radio" name="q${i}" value="${origIdx}">
+            <span class="key">${KEYS[pos]}</span>
+            <span class="txt">${q.opts[origIdx]}</span>
+            <span class="mark"></span>
+          </li>`;
+      });
+
+      card.innerHTML=`
+        <div class="q-top">
+          <div class="q-badge">${i+1}</div>
+          <div class="q-stem">${q.stem}</div>
+        </div>
+        <ul class="opts">${optsHtml}</ul>
+        <div class="exp"><b>Solución.</b> ${q.exp}</div>`;
+      examEl.appendChild(card);
+    });
+  });
+
+  // click handlers
+  document.querySelectorAll('.opt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      if(graded) return;
+      const qi=+opt.dataset.q, orig=+opt.dataset.orig;
+      answers[qi]=orig;
+      const card=document.getElementById('q'+qi);
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+      opt.classList.add('sel');
+      opt.querySelector('input').checked=true;
+      card.classList.add('answered');
+      updateProgress();
+    });
+  });
+
+  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([examEl]); }
+  updateProgress();
+}
+
+function updateProgress(){
+  const done=Object.keys(answers).length;
+  document.getElementById('doneCount').textContent=done;
+  document.getElementById('fill').style.width=(done/QUESTIONS.length*100)+'%';
+}
+
+/* ---------------- GRADING ---------------- */
+document.getElementById('submitBtn').addEventListener('click',()=>{
+  if(graded){ // already graded -> jump to first wrong
+    const firstWrong=document.querySelector('.opt.wrong');
+    if(firstWrong) firstWrong.closest('.q').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const unanswered=QUESTIONS.length-Object.keys(answers).length;
+  if(unanswered>0){
+    const ok=confirm(`Te faltan ${unanswered} preguntas por responder.\n¿Corregir de todos modos?`);
+    if(!ok) return;
+  }
+  grade();
+});
+
+function grade(){
+  graded=true;
+  let correct=0;
+  const perTopic={}; TOPICS.forEach((_,i)=>perTopic[i]={c:0,t:0});
+
+  QUESTIONS.forEach((q,i)=>{
+    perTopic[q.t].t++;
+    const card=document.getElementById('q'+i);
+    card.classList.add('graded');
+    const chosen = answers[i];
+    const isCorrect = chosen===q.correct;
+    if(isCorrect){ correct++; perTopic[q.t].c++; }
+
+    card.querySelectorAll('.opt').forEach(opt=>{
+      const orig=+opt.dataset.orig;
+      const mark=opt.querySelector('.mark');
+      if(orig===q.correct){ opt.classList.add('correct'); mark.textContent='✓ correcta'; }
+      else if(orig===chosen){ opt.classList.add('wrong'); mark.textContent='✗ tu marca'; }
+    });
+  });
+
+  showResult(correct,perTopic);
+  document.getElementById('submitBtn').textContent='Ver fallos';
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>document.getElementById('result').scrollIntoView({behavior:'smooth'}),400);
+}
+
+function showResult(correct,perTopic){
+  const total=QUESTIONS.length;
+  const pct=Math.round(correct/total*100);
+  const nota=(correct/total*20).toFixed(1);
+
+  document.getElementById('rawScore').textContent=`${correct} / ${total}`;
+  document.getElementById('dialPct').textContent=pct+'%';
+  document.getElementById('grade20').textContent=nota;
+
+  const arc=document.getElementById('dialArc');
+  const circ=2*Math.PI*42;
+  arc.style.strokeDashoffset=circ*(1-correct/total);
+  arc.style.stroke = pct>=70? '#5fe0a6' : pct>=50? '#f5c451' : '#f58a9b';
+
+  let bd='';
+  TOPICS.forEach((name,i)=>{
+    const p=perTopic[i];
+    bd+=`<div class="bd"><b>${p.c}/${p.t}</b><span>${name}</span></div>`;
+  });
+  document.getElementById('breakdown').innerHTML=bd;
+  document.getElementById('result').classList.add('show');
+}
+
+/* ---------------- RESET ---------------- */
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(graded || Object.keys(answers).length){
+    if(!confirm('Se borrarán tus respuestas y se barajarán las opciones. ¿Continuar?')) return;
+  }
+  for(const k in answers) delete answers[k];
+  graded=false;
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('submitBtn').textContent='Corregir examen';
+  build();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+/* init */
+build();
+</script>
+</body>
+</html>
